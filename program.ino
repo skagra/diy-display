@@ -1,7 +1,7 @@
 #include <Adafruit_SSD1306.h>
-#include <splash.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
+#include "StatusDisplay.h"
 
 #define PIN_DATA_0 4  // PIN 7
 #define PIN_DATA_1 5  // PIN 8
@@ -25,10 +25,15 @@
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // Reset pin # (or -1 if sharing Arduino reset pin)
 
-// SDA 23 SDA  A4
-// SCL 24 /SCL A5
+// SDA 23 A4
+// SCL 24 A5
+
+#define OP_VALUE_ONE 0x00
+#define OP_VALUE_TWO 0x01
+#define OP_MESSAGE 0x02
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+StatusDisplay *statusDisplay;
 
 void setup()
 {
@@ -42,23 +47,9 @@ void setup()
             ;
     }
 
-    // for (int pin = PIN_DATA_0; pin <= PIN_DATA_7; pin++)
-    // {
-    //     pinMode(pin, OUTPUT);
-    // }
-    // for (int pin = PIN_ADDR_A0; pin <= PIN_ADDR_A3; pin++)
-    // {
-    //     pinMode(pin, OUTPUT);
-    // }
-    // //  pinMode(PIN_CLOCK, OUTPUT);
-    // pinMode(PIN_ENABLE, OUTPUT);
+    statusDisplay = new StatusDisplay(&display);
 
-    // pinMode(PIN_CLOCK, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(PIN_CLOCK), handleClock, RISING);
-    display.clearDisplay();
-    display.setTextColor(WHITE);
-    display.setTextSize(1);
-    display.display();
 }
 
 volatile byte addr;
@@ -89,24 +80,29 @@ void handleClock()
     }
 }
 
+char buffer[2];
+
 void loop()
 {
-
     if (dataExists)
     {
-        //  noInterrupts();
         dataExists = false;
         switch (data)
         {
+        case (OP_VALUE_ONE):
+            statusDisplay->setHexValueOne(data);
+            break;
+        case (OP_VALUE_TWO):
+            statusDisplay->setHexValueTwo(data);
+            break;
+        case (OP_MESSAGE):
+            buffer[0] = data;
+            buffer[1] = (char)0;
+            statusDisplay->addMessage(buffer);
+            break;
         default:
-            Serial.println("INT");
-            display.clearDisplay();
-            display.setCursor(1, 1);
-            display.println(addr);
-            display.println(data);
-            display.display();
+            Serial.println("ERROR: Invalid address");
             break;
         }
-        // interrupts();
     }
 }

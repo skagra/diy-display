@@ -3,27 +3,15 @@
 #include "Wire.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
-#include "Fonts/FreeSans9pt7b.h"
-
-const int SCALE_INSET = 2;
-const int SCALE_FRAME_HEIGHT = 10;
-const int SCALE_HEIGHT = SCALE_FRAME_HEIGHT - 2 * SCALE_INSET;
+// #include "Fonts/FreeSans9pt7b.h"
 
 const int MARGIN = 4;
 
-#define FREQ_LABEL "Freq: "
-#define HZ_LABEL "Hz"
-#define STATUS_LABEL "Status: "
-#define STATUS_RUNNING "RUN"
-#define STATUS_ERROR "ERR"
-#define STATUS_HALTED "HALT"
-
 #define ERROR_PERSISTENCE_MILLIS 300
 
-DiyClockDisplay::DiyClockDisplay(int frequencyMax, Adafruit_SSD1306 *display)
+StatusDisplay::StatusDisplay(Adafruit_SSD1306 *display)
 {
     _display = display;
-    _frequencyMax = frequencyMax;
 
     _displayWidth = display->width();
     _displayHeight = display->height();
@@ -31,7 +19,7 @@ DiyClockDisplay::DiyClockDisplay(int frequencyMax, Adafruit_SSD1306 *display)
     init();
 }
 
-void DiyClockDisplay::init()
+void StatusDisplay::init()
 {
     int16_t x1, y1;
     uint16_t w, h;
@@ -40,113 +28,38 @@ void DiyClockDisplay::init()
     _display->setTextWrap(false);
 
     _display->setTextColor(SSD1306_WHITE);
-    _display->setFont(&FreeSans9pt7b);
-    _fontHeight = FreeSans9pt7b.yAdvance;
+    //   _display->setFont(&FreeSans9pt7b);
+    //_fontHeight = FreeSans9pt7b.yAdvance;
 
-    // Draw the frequency label
-    _display->getTextBounds(FREQ_LABEL, 0, 0, &x1, &y1, &w, &h);
-    _fontBaseOffset = _fontHeight - h;
+    _valueOne = new ValueDisplay(0, 0, _display);
+    _valueTwo = new ValueDisplay(_displayWidth / 2, 0, _display);
 
-    _frequencyX = w;
-    _frequencyBottomY = _fontHeight;
-
-    _display->setCursor(0, _frequencyBottomY - _fontBaseOffset);
-    _display->print(FREQ_LABEL);
-
-    // Draw the scale frame
-    _scaleFrameY = _frequencyBottomY + MARGIN;
-    _display->drawRect(0, _scaleFrameY, _displayWidth, SCALE_FRAME_HEIGHT, SSD1306_WHITE);
-
-    // Draw the status label
-    _display->getTextBounds(STATUS_LABEL, 0, 0, &x1, &y1, &w, &h);
-    _statusX = w;
-    _statusBottomY = _scaleFrameY + SCALE_FRAME_HEIGHT + MARGIN + _fontHeight;
-    _display->setCursor(0, _statusBottomY - _fontBaseOffset);
-    _display->print(STATUS_LABEL);
+    _scroller = new Scroller(128, _display);
 
     _display->display();
 }
 
-void DiyClockDisplay::showError()
+void StatusDisplay::setHexValue(int x, int y, byte value)
 {
-    _display->invertDisplay(true);
-    _display->display();
-    delay(ERROR_PERSISTENCE_MILLIS);
-    _display->invertDisplay(false);
-    _display->display();
+    _display->setCursor(x, y);
+    _display->print(value);
 }
 
-void DiyClockDisplay::drawScale(float fraction)
+void StatusDisplay::setHexValueOne(byte value)
 {
-    int scaleWidth = _displayWidth - (2 * SCALE_INSET);
-
-    // Blank out old scale display
-    _display->fillRect(SCALE_INSET, _scaleFrameY + SCALE_INSET,
-                       scaleWidth, SCALE_HEIGHT,
-                       SSD1306_BLACK);
-
-    _display->fillRect(SCALE_INSET, _scaleFrameY + SCALE_INSET,
-                       scaleWidth * fraction,
-                       SCALE_HEIGHT,
-                       SSD1306_WHITE);
+    _valueOne->showValue(value);
 }
 
-void DiyClockDisplay::drawFrequency(int frequency)
+void StatusDisplay::setHexValueTwo(byte value)
 {
-    _display->fillRect(_frequencyX, 0, _displayWidth, _fontHeight, SSD1306_BLACK);
-
-    _display->setCursor(_frequencyX, _frequencyBottomY - _fontBaseOffset);
-    _display->print(frequency);
-    _display->print(HZ_LABEL);
+    _valueTwo->showValue(value);
 }
 
-void DiyClockDisplay::setFrequency(int frequency)
+void StatusDisplay::addMessage(const char *message)
 {
-    drawFrequency(frequency);
-    drawScale(frequency / (float)_frequencyMax);
-    _display->display();
-}
-
-void DiyClockDisplay::drawStatus(const char *statusString, bool inverse)
-{
-    int16_t x1, y1;
-    uint16_t w, h;
-    _display->getTextBounds(statusString, 0, 0, &x1, &y1, &w, &h);
-
-    _display->fillRect(_statusX, _statusBottomY - _fontHeight, _displayWidth, _fontHeight, SSD1306_BLACK);
-    _display->setCursor(_statusX, _statusBottomY - _fontBaseOffset);
-
-    if (inverse)
+    while ((*message) != (char)0)
     {
-        _display->fillRect(_statusX, _statusBottomY - _fontHeight, w, _fontHeight, SSD1306_WHITE);
-        _display->setTextColor(SSD1306_BLACK);
-    }
-
-    _display->print(statusString);
-
-    if (inverse)
-    {
-        _display->setTextColor(SSD1306_WHITE);
-    }
-
-    _display->display();
-}
-
-void DiyClockDisplay::setStatus(Status status)
-{
-    switch (status)
-    {
-    case Status::Run:
-        drawStatus("RUN");
-        break;
-    case Status::Halt:
-        drawStatus("HALT");
-        break;
-    case Status::Step:
-        drawStatus("STEP");
-        break;
-    case Status::Reset:
-        drawStatus("RESET", true);
-        break;
+        _scroller->addChar(*message);
+        message++;
     }
 }
