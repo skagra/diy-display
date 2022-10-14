@@ -32,10 +32,6 @@ public:
     void setHexValueTwo(byte value);
 
     void addMessage(const char *message);
-
-    // void showHalt();
-
-    // void showError();
 };
 
 #endif

@@ -3,9 +3,6 @@
 #include "Wire.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
-// #include "Fonts/FreeSans9pt7b.h"
-
-const int MARGIN = 4;
 
 #define ERROR_PERSISTENCE_MILLIS 300
 
@@ -28,8 +25,6 @@ void StatusDisplay::init()
     _display->setTextWrap(false);
 
     _display->setTextColor(SSD1306_WHITE);
-    //   _display->setFont(&FreeSans9pt7b);
-    //_fontHeight = FreeSans9pt7b.yAdvance;
 
     _valueOne = new ValueDisplay(0, 0, _display);
     _valueTwo = new ValueDisplay(_displayWidth / 2, 0, _display);
