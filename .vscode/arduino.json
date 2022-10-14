@@ -1,7 +1,0 @@
-{
-    "sketch": "program.ino",
-    "output": "build",
-    "port": "COM5",
-    "board": "arduino:avr:nano",
-    "configuration": "cpu=atmega328"
-}
