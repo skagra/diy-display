@@ -16,8 +16,8 @@
 
 #define PIN_ADDR_A0 PIN_A0 // PIN 10
 #define PIN_ADDR_A1 PIN_A1 // PIN 20
-#define PIN_ADDR_A2 PIN_A2 // PIN 21
-#define PIN_ADDR_A3 PIN_A3 // PIN 22
+// #define PIN_ADDR_A2 PIN_A2 // PIN 21
+// #define PIN_ADDR_A3 PIN_A3 // PIN 22
 
 #define PIN_ENABLE 3 // PIN 6
 #define PIN_CLOCK 2  // PIN 5
@@ -51,6 +51,11 @@ void setup()
 
     statusDisplay = new StatusDisplay(&display);
 
+    statusDisplay->addMessage("Hello!");
+    statusDisplay->setHexValueOne(0xFF);
+    statusDisplay->setHexValueTwo(0xFF);
+    statusDisplay->display();
+
     attachInterrupt(digitalPinToInterrupt(PIN_CLOCK), handleClock, RISING);
 }
 
@@ -64,9 +69,9 @@ void handleClock()
     {
         // Get the address bits
         addr = (digitalRead(PIN_ADDR_A0) == HIGH) |
-               (digitalRead(PIN_ADDR_A1) == HIGH) << 1 |
-               (digitalRead(PIN_ADDR_A2) == HIGH) << 2 |
-               (digitalRead(PIN_ADDR_A3) == HIGH) << 3;
+               (digitalRead(PIN_ADDR_A1) == HIGH) << 1; //|
+                                                        //    (digitalRead(PIN_ADDR_A2) == HIGH) << 2 |
+                                                        //    (digitalRead(PIN_ADDR_A3) == HIGH) << 3;
 
         // Get the data bits
         data = (digitalRead(PIN_DATA_0) == HIGH) |
@@ -82,39 +87,36 @@ void handleClock()
     }
 }
 
-// char buffer[2];
-byte count = 0;
+char buffer[2];
 
 void loop()
 {
-    statusDisplay->addMessage(" Hello > -");
-    statusDisplay->setHexValueOne(count);
-    statusDisplay->setHexValueTwo(count);
-    statusDisplay->display();
-    count++;
-    // while (!Serial.available())
-    //     ;
-    // Serial.read();
+    if (dataExists)
+    {
+        Serial.println("IIII");
 
-    // if (dataExists)
-    // {
-    //     dataExists = false;
-    //     switch (data)
-    //     {
-    //     case (OP_VALUE_ONE):
-    //         statusDisplay->setHexValueOne(data);
-    //         break;
-    //     case (OP_VALUE_TWO):
-    //         statusDisplay->setHexValueTwo(data);
-    //         break;
-    //     case (OP_MESSAGE):
-    //         buffer[0] = data;
-    //         buffer[1] = (char)0;
-    //         statusDisplay->addMessage(buffer);
-    //         break;
-    //     default:
-    //         Serial.println("ERROR: Invalid address");
-    //         break;
-    //     }
-    // }
+        dataExists = false;
+
+        Serial.println(addr);
+        Serial.println(data);
+
+        switch (addr)
+        {
+        case (OP_VALUE_ONE):
+            statusDisplay->setHexValueOne(data);
+            break;
+        case (OP_VALUE_TWO):
+            statusDisplay->setHexValueTwo(data);
+            break;
+        case (OP_MESSAGE):
+            buffer[0] = data;
+            buffer[1] = (char)0;
+            statusDisplay->addMessage(buffer);
+            break;
+        default:
+            Serial.println("ERROR: Invalid address");
+            break;
+        }
+        statusDisplay->display();
+    }
 }
