@@ -34,7 +34,7 @@ void StatusDisplay::init()
     _valueOne = new ValueDisplay(0, 0, _display);
     _valueTwo = new ValueDisplay(_displayWidth / 2, 0, _display);
 
-    _scroller = new Scroller(128, _display);
+    _scroller = new Scroller(26, _display);
 
     _display->display();
 }
@@ -62,4 +62,9 @@ void StatusDisplay::addMessage(const char *message)
         _scroller->addChar(*message);
         message++;
     }
+}
+
+void StatusDisplay::display()
+{
+    _display->display();
 }

@@ -71,7 +71,7 @@ void ValueDisplay::showValue(byte value)
       drawDec(value);
       drawBin(value);
 
-      _display->display();
+      //  _display->display();
 
       _oldValue = value;
       first = false;

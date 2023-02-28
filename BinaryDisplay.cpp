@@ -47,7 +47,7 @@ void BinaryDisplay::showValue(byte value)
          drawCell(cell, set);
          bitMask /= 2;
       }
-      _display->display();
+      //_display->display();
 
       first = false;
       _oldValue = value;

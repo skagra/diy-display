@@ -33,9 +33,7 @@ public:
 
     void addMessage(const char *message);
 
-    // void showHalt();
-
-    // void showError();
+    void display();
 };
 
 #endif

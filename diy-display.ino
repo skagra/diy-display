@@ -1,7 +1,6 @@
 #include <Adafruit_SSD1306.h>
 #include <splash.h>
 
-#include <Adafruit_SSD1306.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include "StatusDisplay.h"
@@ -83,29 +82,39 @@ void handleClock()
     }
 }
 
-char buffer[2];
+// char buffer[2];
+byte count = 0;
 
 void loop()
 {
-    if (dataExists)
-    {
-        dataExists = false;
-        switch (data)
-        {
-        case (OP_VALUE_ONE):
-            statusDisplay->setHexValueOne(data);
-            break;
-        case (OP_VALUE_TWO):
-            statusDisplay->setHexValueTwo(data);
-            break;
-        case (OP_MESSAGE):
-            buffer[0] = data;
-            buffer[1] = (char)0;
-            statusDisplay->addMessage(buffer);
-            break;
-        default:
-            Serial.println("ERROR: Invalid address");
-            break;
-        }
-    }
+    statusDisplay->addMessage(" Hello > -");
+    statusDisplay->setHexValueOne(count);
+    statusDisplay->setHexValueTwo(count);
+    statusDisplay->display();
+    count++;
+    // while (!Serial.available())
+    //     ;
+    // Serial.read();
+
+    // if (dataExists)
+    // {
+    //     dataExists = false;
+    //     switch (data)
+    //     {
+    //     case (OP_VALUE_ONE):
+    //         statusDisplay->setHexValueOne(data);
+    //         break;
+    //     case (OP_VALUE_TWO):
+    //         statusDisplay->setHexValueTwo(data);
+    //         break;
+    //     case (OP_MESSAGE):
+    //         buffer[0] = data;
+    //         buffer[1] = (char)0;
+    //         statusDisplay->addMessage(buffer);
+    //         break;
+    //     default:
+    //         Serial.println("ERROR: Invalid address");
+    //         break;
+    //     }
+    // }
 }

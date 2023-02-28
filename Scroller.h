@@ -8,6 +8,11 @@ class Scroller
 {
 private:
     Adafruit_SSD1306 *_display;
+    char *_buffer;
+    int _bufferIndex = 0;
+    int _bufferSize;
+
+    void addCharToBuffer(const char character);
 
 public:
     Scroller(int width, Adafruit_SSD1306 *display);
