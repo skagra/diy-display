@@ -27,7 +27,7 @@ void Scroller::addCharToBuffer(const char character)
 
 void Scroller::clear()
 {
-    memset(_buffer, (byte)' ', _bufferSize);
+    memset(_buffer, (byte)' ', _bufferSize - 1);
     _display->fillRect(0, 40, 128, 20, SSD1306_BLACK);
     _bufferIndex = 0;
 }

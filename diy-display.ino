@@ -1,3 +1,4 @@
+#include <arduino.h>
 #include <Adafruit_SSD1306.h>
 #include <splash.h>
 
@@ -36,6 +37,21 @@ void setup()
 {
     Serial.begin(9600);
 
+    pinMode(PIN_ADDR_A0, INPUT);
+    pinMode(PIN_ADDR_A1, INPUT);
+
+    pinMode(PIN_DATA_0, INPUT);
+    pinMode(PIN_DATA_1, INPUT);
+    pinMode(PIN_DATA_2, INPUT);
+    pinMode(PIN_DATA_3, INPUT);
+    pinMode(PIN_DATA_4, INPUT);
+    pinMode(PIN_DATA_5, INPUT);
+    pinMode(PIN_DATA_6, INPUT);
+    pinMode(PIN_DATA_7, INPUT);
+
+    pinMode(PIN_ENABLE, INPUT);
+    pinMode(PIN_CLOCK, INPUT);
+
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
     {
@@ -68,22 +84,13 @@ volatile bool dataExists = false;
 
 void handleClock()
 {
-
     if (digitalRead(PIN_ENABLE) == HIGH)
     {
         // Get the address bits
-        addr = (digitalRead(PIN_ADDR_A0) == HIGH) |
-               (digitalRead(PIN_ADDR_A1) == HIGH) << 1;
+        addr = PINC & 0x03;
 
         // Get the data bits
-        data = (digitalRead(PIN_DATA_0) == HIGH) |
-               (digitalRead(PIN_DATA_1) == HIGH) << 1 |
-               (digitalRead(PIN_DATA_2) == HIGH) << 2 |
-               (digitalRead(PIN_DATA_3) == HIGH) << 3 |
-               (digitalRead(PIN_DATA_4) == HIGH) << 4 |
-               (digitalRead(PIN_DATA_5) == HIGH) << 5 |
-               (digitalRead(PIN_DATA_6) == HIGH) << 6 |
-               (digitalRead(PIN_DATA_7) == HIGH) << 7;
+        data = (PIND >> 4) | (PINB << 4);
 
         dataExists = true;
     }
@@ -95,21 +102,22 @@ void loop()
 {
     if (dataExists)
     {
+        noInterrupts();
+        byte localAddr = addr;
+        byte localData = data;
         dataExists = false;
+        interrupts();
 
-        Serial.println(addr);
-        Serial.println(data);
-
-        switch (addr)
+        switch (localAddr)
         {
         case (OP_VALUE_ONE):
-            statusDisplay->setHexValueOne(data);
+            statusDisplay->setHexValueOne(localData);
             break;
         case (OP_VALUE_TWO):
-            statusDisplay->setHexValueTwo(data);
+            statusDisplay->setHexValueTwo(localData);
             break;
         case (OP_MESSAGE):
-            buffer[0] = data;
+            buffer[0] = localData;
             buffer[1] = (char)0;
             statusDisplay->addMessage(buffer);
             break;
