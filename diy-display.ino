@@ -16,8 +16,6 @@
 
 #define PIN_ADDR_A0 PIN_A0 // PIN 10
 #define PIN_ADDR_A1 PIN_A1 // PIN 20
-// #define PIN_ADDR_A2 PIN_A2 // PIN 21
-// #define PIN_ADDR_A3 PIN_A3 // PIN 22
 
 #define PIN_ENABLE 3 // PIN 6
 #define PIN_CLOCK 2  // PIN 5
@@ -26,9 +24,6 @@
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // Reset pin # (or -1 if sharing Arduino reset pin)
-
-// SDA 23 A4
-// SCL 24 A5
 
 #define OP_VALUE_ONE 0x00
 #define OP_VALUE_TWO 0x01
@@ -51,9 +46,17 @@ void setup()
 
     statusDisplay = new StatusDisplay(&display);
 
-    statusDisplay->addMessage("Hello!");
     statusDisplay->setHexValueOne(0xFF);
     statusDisplay->setHexValueTwo(0xFF);
+    statusDisplay->addMessage("DIY CPU");
+    statusDisplay->display();
+    delay(500);
+    statusDisplay->addMessage("...READY!");
+    statusDisplay->display();
+    delay(1000);
+    statusDisplay->clearMessage();
+    statusDisplay->setHexValueOne(0);
+    statusDisplay->setHexValueTwo(0);
     statusDisplay->display();
 
     attachInterrupt(digitalPinToInterrupt(PIN_CLOCK), handleClock, RISING);
@@ -65,13 +68,12 @@ volatile bool dataExists = false;
 
 void handleClock()
 {
+
     if (digitalRead(PIN_ENABLE) == HIGH)
     {
         // Get the address bits
         addr = (digitalRead(PIN_ADDR_A0) == HIGH) |
-               (digitalRead(PIN_ADDR_A1) == HIGH) << 1; //|
-                                                        //    (digitalRead(PIN_ADDR_A2) == HIGH) << 2 |
-                                                        //    (digitalRead(PIN_ADDR_A3) == HIGH) << 3;
+               (digitalRead(PIN_ADDR_A1) == HIGH) << 1;
 
         // Get the data bits
         data = (digitalRead(PIN_DATA_0) == HIGH) |
@@ -93,8 +95,6 @@ void loop()
 {
     if (dataExists)
     {
-        Serial.println("IIII");
-
         dataExists = false;
 
         Serial.println(addr);

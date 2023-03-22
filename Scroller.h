@@ -18,6 +18,8 @@ public:
     Scroller(int width, Adafruit_SSD1306 *display);
 
     void addChar(const char character);
+
+    void clear();
 };
 
 #endif

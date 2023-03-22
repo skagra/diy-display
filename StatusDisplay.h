@@ -33,6 +33,8 @@ public:
 
     void addMessage(const char *message);
 
+    void clearMessage();
+
     void display();
 };
 
