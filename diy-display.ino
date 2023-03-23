@@ -1,4 +1,4 @@
-#include <arduino.h>
+#include "Pins.h"
 #include <Adafruit_SSD1306.h>
 #include <splash.h>
 
@@ -6,31 +6,29 @@
 #include <Adafruit_GFX.h>
 #include "StatusDisplay.h"
 
-#define PIN_DATA_0 4  // PIN 7
-#define PIN_DATA_1 5  // PIN 8
-#define PIN_DATA_2 6  // PIN 9
-#define PIN_DATA_3 7  // PIN 10
-#define PIN_DATA_4 8  // PIN 11
-#define PIN_DATA_5 9  // PIN 12
-#define PIN_DATA_6 10 // PIN 13
-#define PIN_DATA_7 11 // PIN 14
+/*
+ * Operation values encoded on the address lines.
+ *
+ * Each value defines a particular display location/format.
+ */
+#define OP_VALUE_ONE 0x00 // Display on digital value 1
+#define OP_VALUE_TWO 0x01 // Display on digital value 2
+#define OP_MESSAGE 0x02   // Display on scrolling text line
 
-#define PIN_ADDR_A0 PIN_A0 // PIN 10
-#define PIN_ADDR_A1 PIN_A1 // PIN 20
-
-#define PIN_ENABLE 3 // PIN 6
-#define PIN_CLOCK 2  // PIN 5
-
+/*
+ * SSD1306 OLED Display settings
+ *
+ * Note: This display uses i2c and so the SDA and SCL (A4/A5 on a Nano)
+ */
 #define SCREEN_ADDRESS 0x3C
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define OLED_RESET -1    // Reset pin # (or -1 if sharing Arduino reset pin)
 
-#define OP_VALUE_ONE 0x00
-#define OP_VALUE_TWO 0x01
-#define OP_MESSAGE 0x02
-
+// SSD1306 OLED display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+// Display code
 StatusDisplay *statusDisplay;
 
 void setup()
@@ -50,7 +48,7 @@ void setup()
     pinMode(PIN_DATA_7, INPUT);
 
     pinMode(PIN_ENABLE, INPUT);
-    pinMode(PIN_CLOCK, INPUT);
+    pinMode(PIN_INTERRUPT, INPUT);
 
     // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
@@ -69,20 +67,21 @@ void setup()
     delay(500);
     statusDisplay->addMessage("...READY!");
     statusDisplay->display();
-    delay(1000);
+    delay(500);
     statusDisplay->clearMessage();
     statusDisplay->setHexValueOne(0);
     statusDisplay->setHexValueTwo(0);
     statusDisplay->display();
 
-    attachInterrupt(digitalPinToInterrupt(PIN_CLOCK), handleClock, RISING);
+    attachInterrupt(digitalPinToInterrupt(PIN_INTERRUPT), handleInterrupt, RISING);
 }
 
+// Globals to grab data/addr values
 volatile byte addr;
 volatile byte data;
 volatile bool dataExists = false;
 
-void handleClock()
+void handleInterrupt()
 {
     if (digitalRead(PIN_ENABLE) == HIGH)
     {
@@ -96,6 +95,7 @@ void handleClock()
     }
 }
 
+// Character buffer to send message characters to display
 char buffer[2];
 
 void loop()

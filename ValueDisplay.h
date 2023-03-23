@@ -16,7 +16,7 @@ private:
     int _yTop;
 
     byte _oldValue = 0;
-    bool first = true;
+    bool _first = true;
 
     char _stringBuffer[6];
 
@@ -24,6 +24,9 @@ private:
     void drawHex(byte value);
     void drawDec(byte value);
     void drawBin(byte value);
+
+    void hexString(byte value, char *buffer);
+    void decString(byte value, char *buffer);
 
 public:
     ValueDisplay(int xLeft, int yTop, Adafruit_SSD1306 *display);

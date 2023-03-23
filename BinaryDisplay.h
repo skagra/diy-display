@@ -13,7 +13,7 @@ private:
     int _yTop;
 
     byte _oldValue = 0;
-    bool first = true;
+    bool _first = true;
 
     void init();
 

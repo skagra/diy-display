@@ -4,8 +4,6 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_SSD1306.h"
 
-#define ERROR_PERSISTENCE_MILLIS 300
-
 StatusDisplay::StatusDisplay(Adafruit_SSD1306 *display)
 {
     _display = display;
@@ -26,10 +24,13 @@ void StatusDisplay::init()
 
     _display->setTextColor(SSD1306_WHITE);
 
-    _valueOne = new ValueDisplay(0, 0, _display);
-    _valueTwo = new ValueDisplay(_displayWidth / 2, 0, _display);
+    _display->setCursor(44, 0);
+    _display->print("DIY CPU");
 
-    _scroller = new Scroller(24, _display);
+    _valueOne = new ValueDisplay(0, 40, _display);
+    _valueTwo = new ValueDisplay(_displayWidth / 2, 40, _display);
+
+    _scroller = new Scroller(20, 24, _display);
 
     _display->display();
 }

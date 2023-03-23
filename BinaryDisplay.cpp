@@ -37,7 +37,7 @@ void BinaryDisplay::drawCell(int cellIndex, bool set)
 
 void BinaryDisplay::showValue(byte value)
 {
-   if (value != _oldValue || first)
+   if (value != _oldValue || _first)
    {
       int bitMask = 128;
 
@@ -47,9 +47,8 @@ void BinaryDisplay::showValue(byte value)
          drawCell(cell, set);
          bitMask /= 2;
       }
-      //_display->display();
 
-      first = false;
+      _first = false;
       _oldValue = value;
    }
 }

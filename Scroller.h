@@ -11,11 +11,12 @@ private:
     char *_buffer;
     int _bufferIndex = 0;
     int _bufferSize;
+    int _topY;
 
     void addCharToBuffer(const char character);
 
 public:
-    Scroller(int width, Adafruit_SSD1306 *display);
+    Scroller(int topY, int width, Adafruit_SSD1306 *display);
 
     void addChar(const char character);
 

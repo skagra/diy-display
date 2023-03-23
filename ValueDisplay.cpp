@@ -13,13 +13,13 @@ void ValueDisplay::init()
    showValue(0);
 }
 
-void hexString(byte value, char *buffer)
+void ValueDisplay::hexString(byte value, char *buffer)
 {
    sprintf(buffer, "H:%02X", value);
    buffer[4] = (byte)0;
 }
 
-void decString(byte value, char *buffer)
+void ValueDisplay::decString(byte value, char *buffer)
 {
    sprintf(buffer, "D:%03i", value);
    buffer[5] = (byte)0;
@@ -65,15 +65,13 @@ ValueDisplay::ValueDisplay(int xLeft, int yTop, Adafruit_SSD1306 *display)
 
 void ValueDisplay::showValue(byte value)
 {
-   if (value != _oldValue || first)
+   if (value != _oldValue || _first)
    {
       drawHex(value);
       drawDec(value);
       drawBin(value);
 
-      //  _display->display();
-
       _oldValue = value;
-      first = false;
+      _first = false;
    }
 }
