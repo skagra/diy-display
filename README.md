@@ -29,5 +29,5 @@ The pin out is defined in [Pins.h](Pins.h).
 
 # Testing
 
-A separate testing project, which puts the display through its paces, may be found [here](../diy-display-tester).
+A separate testing project, which puts the display through its paces, may be found [here](https://github.com/skagra/diy-display-tester).
 
