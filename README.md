@@ -9,10 +9,10 @@ A `SSD1306` OLED is used to show:
 
 # Interface
 
-The display is interrupt driven.  If the `ENABLE` pin is high then on a rising edge on the interrupt pin the following values are captured :
+The display is interrupt driven.  If the `ENABLE` pin is high, then on a rising edge on the `INTERRUPT` pin the following values are captured :
 
-* `DATA` - 8 bits of data
-* `ADDR` - 2 bits indicating whether the data value should be shown as `value 1`, `value 2` or  on the scrolling text character.
+* `DATA` - 8 bits of data.
+* `ADDR` - 2 bits indicating whether the data value should be shown as `value 1`, `value 2` or on the scrolling text line.
 
 `ADDR` encoding is:
 
@@ -23,9 +23,11 @@ The display is interrupt driven.  If the `ENABLE` pin is high then on a rising e
 | 0x02  | Scrolling text  |
 | 0x11  | Unused          |
 
-# Pin Out
+# Circuit
 
 The pin out is defined in [Pins.h](Pins.h).
+
+![Schematic](docs/schematic.png)
 
 # Testing
 
