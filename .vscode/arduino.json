@@ -1,7 +1,7 @@
 {
     "sketch": "diy-display.ino",
     "output": "build",
-    "port": "COM3",
+    "port": "COM5",
     "board": "arduino:avr:nano",
     "configuration": "cpu=atmega328"
 }
