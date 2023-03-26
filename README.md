@@ -33,3 +33,8 @@ The pin out is defined in [Pins.h](Pins.h).
 
 A separate testing project, which puts the display through its paces, may be found [here](https://github.com/skagra/diy-display-tester).
 
+# Board
+
+The following shows the display board together with the test rig.
+
+![Board](docs/board.png)
