@@ -77,7 +77,7 @@ void setup()
 }
 
 // Globals to grab data/addr values
-#define BUFFER_SIZE 32
+#define BUFFER_SIZE 64
 
 byte addrBuffer[BUFFER_SIZE];
 byte dataBuffer[BUFFER_SIZE];
