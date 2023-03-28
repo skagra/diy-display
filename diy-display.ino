@@ -77,23 +77,33 @@ void setup()
 }
 
 // Globals to grab data/addr values
-#define BUFFER_SIZE 64
+#define BUFFER_SIZE 32
 
 byte addrBuffer[BUFFER_SIZE];
 byte dataBuffer[BUFFER_SIZE];
-volatile int freeBufferIndex = 0;
+volatile int writeBufferIndex = 0;
+volatile int buffered = 0;
+volatile int readBufferIndex = 0;
 
 void handleInterrupt()
 {
-    if (digitalRead(PIN_ENABLE) == HIGH && freeBufferIndex < BUFFER_SIZE)
+    if (digitalRead(PIN_ENABLE) == HIGH && buffered < BUFFER_SIZE)
     {
         // Get the address bits
-        addrBuffer[freeBufferIndex] = PINC & 0x03;
+        addrBuffer[writeBufferIndex] = PINC & 0x03;
 
         // Get the data bits
-        dataBuffer[freeBufferIndex] = (PIND >> 4) | (PINB << 4);
+        dataBuffer[writeBufferIndex] = (PIND >> 4) | (PINB << 4);
 
-        freeBufferIndex++;
+        if (writeBufferIndex < BUFFER_SIZE - 1)
+        {
+            writeBufferIndex++;
+        }
+        else
+        {
+            writeBufferIndex = 0;
+        }
+        buffered++;
     }
 }
 
@@ -102,17 +112,21 @@ char messageBuffer[2];
 
 void loop()
 {
-    if (freeBufferIndex > 0)
+    if (buffered > 0)
     {
         noInterrupts();
-        byte localAddr = *addrBuffer;
-        byte localData = *dataBuffer;
-        freeBufferIndex--;
-        if (freeBufferIndex > 0)
+        byte localAddr = addrBuffer[readBufferIndex];
+        byte localData = dataBuffer[readBufferIndex];
+
+        if (readBufferIndex < BUFFER_SIZE - 1)
         {
-            memmove(dataBuffer, dataBuffer + 1, freeBufferIndex);
-            memmove(addrBuffer, addrBuffer + 1, freeBufferIndex);
+            readBufferIndex++;
         }
+        else
+        {
+            readBufferIndex = 0;
+        }
+        buffered--;
         interrupts();
 
         switch (localAddr)
