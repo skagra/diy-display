@@ -77,7 +77,7 @@ void setup()
 }
 
 // Globals to grab data/addr values
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 64
 
 volatile byte addrBuffer[BUFFER_SIZE];
 volatile byte dataBuffer[BUFFER_SIZE];
