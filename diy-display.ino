@@ -79,10 +79,9 @@ void setup()
 // Globals to grab data/addr values
 #define BUFFER_SIZE 64
 
-volatile byte addrBuffer[BUFFER_SIZE];
-volatile byte dataBuffer[BUFFER_SIZE];
+byte addrBuffer[BUFFER_SIZE];
+byte dataBuffer[BUFFER_SIZE];
 volatile int freeBufferIndex = 0;
-volatile int readBufferIndex = 0;
 
 void handleInterrupt()
 {
@@ -106,12 +105,13 @@ void loop()
     if (freeBufferIndex > 0)
     {
         noInterrupts();
-        byte localAddr = addrBuffer[readBufferIndex];
-        byte localData = dataBuffer[readBufferIndex];
+        byte localAddr = *addrBuffer;
+        byte localData = *dataBuffer;
         freeBufferIndex--;
-        if (readBufferIndex > 0)
+        if (freeBufferIndex > 0)
         {
-            readBufferIndex--;
+            memmove(dataBuffer, dataBuffer + 1, freeBufferIndex);
+            memmove(addrBuffer, addrBuffer + 1, freeBufferIndex);
         }
         interrupts();
 
