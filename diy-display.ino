@@ -77,35 +77,42 @@ void setup()
 }
 
 // Globals to grab data/addr values
-volatile byte addr;
-volatile byte data;
-volatile bool dataExists = false;
+#define BUFFER_SIZE 256
+
+volatile byte addrBuffer[BUFFER_SIZE];
+volatile byte dataBuffer[BUFFER_SIZE];
+volatile int freeBufferIndex = 0;
+volatile int readBufferIndex = 0;
 
 void handleInterrupt()
 {
-    if (digitalRead(PIN_ENABLE) == HIGH)
+    if (digitalRead(PIN_ENABLE) == HIGH && freeBufferIndex < BUFFER_SIZE)
     {
         // Get the address bits
-        addr = PINC & 0x03;
+        addrBuffer[freeBufferIndex] = PINC & 0x03;
 
         // Get the data bits
-        data = (PIND >> 4) | (PINB << 4);
+        dataBuffer[freeBufferIndex] = (PIND >> 4) | (PINB << 4);
 
-        dataExists = true;
+        freeBufferIndex++;
     }
 }
 
 // Character buffer to send message characters to display
-char buffer[2];
+char messageBuffer[2];
 
 void loop()
 {
-    if (dataExists)
+    if (freeBufferIndex > 0)
     {
         noInterrupts();
-        byte localAddr = addr;
-        byte localData = data;
-        dataExists = false;
+        byte localAddr = addrBuffer[readBufferIndex];
+        byte localData = dataBuffer[readBufferIndex];
+        freeBufferIndex--;
+        if (readBufferIndex > 0)
+        {
+            readBufferIndex--;
+        }
         interrupts();
 
         switch (localAddr)
@@ -117,9 +124,9 @@ void loop()
             statusDisplay->setHexValueTwo(localData);
             break;
         case (OP_MESSAGE):
-            buffer[0] = localData;
-            buffer[1] = (char)0;
-            statusDisplay->addMessage(buffer);
+            messageBuffer[0] = localData;
+            messageBuffer[1] = (char)0;
+            statusDisplay->addMessage(messageBuffer);
             break;
         default:
             Serial.println("ERROR: Invalid address");
