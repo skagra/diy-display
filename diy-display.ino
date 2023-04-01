@@ -138,9 +138,16 @@ void loop()
             statusDisplay->setHexValueTwo(localData);
             break;
         case (OP_MESSAGE):
-            messageBuffer[0] = localData;
-            messageBuffer[1] = (char)0;
-            statusDisplay->addMessage(messageBuffer);
+            if (localData != 0)
+            {
+                messageBuffer[0] = localData;
+                messageBuffer[1] = (char)0;
+                statusDisplay->addMessage(messageBuffer);
+            }
+            else
+            {
+                statusDisplay->clearMessage();
+            }
             break;
         default:
             Serial.println("ERROR: Invalid address");
