@@ -1,6 +1,6 @@
 # DIY DISPLAY
 
-A simple memory mapped *OLED display* for the [diy-cpu](https://github.com/skagra/diy-cpu) project.
+A simple memory mapped *OLED display* for the [DIY CPU](https://github.com/skagra/diy-cpu-meta) project.
 
 A `SSD1306` OLED is used to show:
 
